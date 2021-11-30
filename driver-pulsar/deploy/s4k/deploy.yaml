@@ -62,13 +62,13 @@
         serviceUrl: "pulsar://{{ hostvars[groups['pulsar'][0]].private_ip }}:6650/"
         httpUrl: "http://{{ hostvars[groups['pulsar'][0]].private_ip }}:8080/"
         bootstrapServers: "{{ groups['pulsar'] | map('extract', hostvars, ['private_ip']) | map('regex_replace', '^(.*)$', '\\1:9092') | join(',') }}"
-        plainBootstrapServers: "{{ groups['pulsar'] | map('extract', hostvars, ['private_ip']) | map('regex_replace', '^(.*)$', 'PLAINTEXT://\\1:9092') | join(',') }}"
         pulsarVersion: "2.8.1"
     - file: path=/opt/pulsar state=absent
     - file: path=/opt/pulsar state=directory
     - name: Download Luna binary package
       unarchive:
-        src: "../../../../luna-packages/lunastreaming-2.8.0.1.1.7-SNAPSHOT-bin.tar.gz"
+        src: "https://github.com/datastax/pulsar/releases/download/ls280_1.1.7/lunastreaming-2.8.0.1.1.7-bin.tar.gz"
+        remote_src: yes
         dest: /opt/pulsar
         extra_opts: ["--strip-components=1"]
     - file: path=/opt/pulsar/protocols state=absent
@@ -269,7 +269,7 @@
       lineinfile:
          dest: /opt/benchmark/bin/benchmark-worker
          regexp: '^JVM_MEM='
-         line: 'JVM_MEM="-Xms6G -Xmx12G -XX:+UseG1GC -XX:MaxGCPauseMillis=10 -XX:+ParallelRefProcEnabled -XX:+UnlockExperimentalVMOptions -XX:+AggressiveOpts -XX:+DoEscapeAnalysis -XX:ParallelGCThreads=32 -XX:ConcGCThreads=32 -XX:G1NewSizePercent=50 -XX:+DisableExplicitGC -XX:-ResizePLAB -XX:+PerfDisableSharedMem -XX:+AlwaysPreTouch -XX:-UseBiasedLocking"'
+         line: 'JVM_MEM="-Xms6G -Xmx12G -XX:+UnlockExperimentalVMOptions -XX:+UseZGC -XX:+ParallelRefProcEnabled -XX:+AggressiveOpts -XX:+DoEscapeAnalysis -XX:ParallelGCThreads=12 -XX:ConcGCThreads=12 -XX:+DisableExplicitGC -XX:+PerfDisableSharedMem -XX:+AlwaysPreTouch -XX:-UseBiasedLocking"'
     - name: Configure memory
       lineinfile:
          dest: /opt/benchmark/bin/benchmark
