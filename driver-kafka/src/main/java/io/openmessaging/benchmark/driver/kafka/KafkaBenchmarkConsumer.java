@@ -48,6 +48,7 @@ public class KafkaBenchmarkConsumer implements BenchmarkConsumer {
     private final Future<?> consumerTask;
     private volatile boolean closing = false;
     private boolean autoCommit;
+
     public KafkaBenchmarkConsumer(KafkaConsumer<String, byte[]> consumer, Properties consumerConfig, ConsumerCallback callback) {
         this.consumer = consumer;
         this.executor = Executors.newSingleThreadExecutor();
@@ -68,7 +69,7 @@ public class KafkaBenchmarkConsumer implements BenchmarkConsumer {
                     if (!autoCommit&&!offsetMap.isEmpty()) {
                         consumer.commitSync(offsetMap);
                     }
-                }catch(Exception e){
+                } catch(Exception e) {
                     log.error("exception occur while consuming message", e);
                 }
             }

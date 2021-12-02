@@ -1,6 +1,6 @@
 # The OpenMessaging Benchmark Framework
 
-**Notice：** We do not consider or plan to release any unilateral test results based on this standard. For reference, you can purchase server tests on the cloud by yourself. 
+**Notice：** We may release test results based on our fork this standard. For reference, you can purchase your benchmark tests on the cloud by yourself. 
 
 This repository houses user-friendly, cloud-ready benchmarking suites for the following messaging platforms:
 
@@ -11,6 +11,11 @@ This repository houses user-friendly, cloud-ready benchmarking suites for the fo
 * [NATS Streaming](https://nats.io/)
 * [Redis](https://redis.com/)
 * [Pravega](https://pravega.io/)
+
+## DataStax Starlight for X
+
+* JMS
+* Apache Kafka
 
 > More details could be found at the [official documentation](http://openmessaging.cloud/docs/benchmarks/).
 
