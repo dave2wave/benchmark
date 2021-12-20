@@ -17,24 +17,23 @@
 # under the License.
 #
 
+# required
+java_jdk: java-11-openjdk
 
+# required
+benchmark_package:
+  title: "Open Messaging Benchmark Client"
+  path: "../../package/target/openmessaging-benchmark-0.0.1-SNAPSHOT-bin.tar.gz"
+  name: "openmessaging-benchmark-0.0.1-SNAPSHOT"
 
-### Use all the broker defaults except for the following
+# required
+pulsar_package:
+  title: "Apache Pulsar"
+  version: "2.8.1"
+  url: "https://downloads.apache.org/pulsar/pulsar-2.8.1/apache-pulsar-2.8.1-bin.tar.gz"
+  broker: "broker.conf"
 
-# Zookeeper quorum connection string
-zookeeperServers={{ zookeeperServers }}
-
-# Global Zookeeper quorum connection string
-globalZookeeperServers={{ zookeeperServers }}
-
-# Hostname or IP address the service advertises to the outside world. If not set, the value of InetAddress.getLocalHost().getHostName() is used.
-advertisedAddress={{ hostvars[inventory_hostname].private_ip }}
-
-# Name of the cluster to which this broker belongs to
-clusterName=local
-
-loadBalancerAutoUnloadSplitBundlesEnabled=false
-
-defaultNumberOfNamespaceBundles=64
-
-
+# optional
+prometheus_package:
+  version: "2.2.1"
+  url: "https://github.com/prometheus/prometheus/releases/download/v2.2.1/prometheus-2.2.1.linux-amd64.tar.gz"

@@ -17,22 +17,23 @@
 # under the License.
 #
 
-workers:
-  title: {{ benchmark_package['title'] }}
-  path: {{ benchmark_package['path'] }}
-  name: {{ benchmark_package['name'] }}
-  count: {{ groups['client'] | count }}
-  instance_type: {{ hostvars[groups['client'][0]].instance_type }}
+# required
+java_jdk: java-11-openjdk
 
-brokers:
-  title: {{ pulsar_package['title'] }}
-  version: {{ pulsar_package['version'] }}
-  url: {{ pulsar_package['url'] }}
-{% if protocol_handlers is defined %}
-  protocol_handlers:
-    title: {{ protocol_handlers['title'] }}
-    version: {{ protocol_handlers['version'] }}
-    url: {{ protocol_handlers['url'] }}
-{% endif %}
-  count: {{ groups['pulsar'] | count }}
-  instance_type: {{ hostvars[groups['pulsar'][0]].instance_type }}
+# required
+benchmark_package:
+  title: "Open Messaging Benchmark Client"
+  path: "../../package/target/openmessaging-benchmark-0.0.1-SNAPSHOT-bin.tar.gz"
+  name: "openmessaging-benchmark-0.0.1-SNAPSHOT"
+
+# required
+pulsar_package:
+  title: "Apache Pulsar"
+  version: "2.9.0"
+  url: "https://downloads.apache.org/pulsar/pulsar-2.9.0/apache-pulsar-2.9.0-bin.tar.gz"
+  broker: "broker.conf"
+
+# optional
+prometheus_package:
+  version: "2.2.1"
+  url: "https://github.com/prometheus/prometheus/releases/download/v2.2.1/prometheus-2.2.1.linux-amd64.tar.gz"

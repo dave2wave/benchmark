@@ -61,27 +61,19 @@
         zookeeperServers: "{{ groups['zookeeper'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | map('regex_replace', '^(.*)$', '\\1:2181') | join(',') }}"
         serviceUrl: "pulsar://{{ hostvars[groups['pulsar'][0]].private_ip }}:6650/"
         httpUrl: "http://{{ hostvars[groups['pulsar'][0]].private_ip }}:8080/"
-        bootstrapServers: "{{ groups['pulsar'] | map('extract', hostvars, ['private_ip']) | map('regex_replace', '^(.*)$', '\\1:9092') | join(',') }}"
         pulsarVersion: "2.8.1"
     - file: path=/opt/pulsar state=absent
     - file: path=/opt/pulsar state=directory
-    - name: "Download {{ pulsar_package['title'] }} {{ pulsar_package['version'] }} binary package"
+    - name: Download Pulsar binary package
       unarchive:
-        src: "{{ pulsar_package['url'] }}"
+        src: "https://downloads.apache.org/pulsar/pulsar-{{ pulsarVersion }}/apache-pulsar-{{ pulsarVersion }}-bin.tar.gz"
         remote_src: yes
         dest: /opt/pulsar
         extra_opts: ["--strip-components=1"]
-    - file: path=/opt/pulsar/protocols state=absent
-    - file: path=/opt/pulsar/protocols state=directory
-    - name: "Download {{ protocol_handlers['title'] }} {{ protocol_handlers['version'] }} binary package"
-      when: protocol_handlers is defined
-      get_url:
-        url: "{{ protocol_handlers['url'] }}"
-        dest: /opt/pulsar/protocols
     - set_fact:
         private_ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
-        max_heap_memory: "24g"
-        max_direct_memory: "24g"
+        max_heap_memory: "6g"
+        max_direct_memory: "6g"
     - template:
         src: "templates/pulsar_env.sh"
         dest: "/opt/pulsar/conf/pulsar_env.sh"
@@ -190,7 +182,7 @@
      - set_fact:
          benchmark_version: "{{ maven_version.stdout }}"
 
-- name: "{{ benchmark_package['title'] }} setup"
+- name: Pulsar benchmarking client setup
   hosts: client
   connection: ssh
   become: true
@@ -202,15 +194,11 @@
     - file: path=/opt/benchmark state=absent
     - name: Copy benchmark code
       unarchive:
-        src: "{{ benchmark_package['path'] }}"
+        src: ../../package/target/openmessaging-benchmark-0.0.1-SNAPSHOT-bin.tar.gz
         dest: /opt
-    - shell: "mv /opt/{{ benchmark_package['name'] }} /opt/benchmark"
-    - name: Configure installation information
-      template:
-        src: "templates/install.yaml"
-        dest: "/opt/benchmark/install.yaml"
-    - name: Configure workers information 
-      template:
+    - shell: mv /opt/openmessaging-benchmark-0.0.1-SNAPSHOT /opt/benchmark
+
+    - template:
         src: "templates/workers.yaml"
         dest: "/opt/benchmark/workers.yaml"
     - name: Get list of driver config files
@@ -229,17 +217,6 @@
          regexp: '^  httpUrl: '
          line: '  httpUrl: {{ httpUrl }}'
       with_items: '{{ drivers_list.stdout_lines }}'
-
-    - name: Get list of jms driver config files
-      raw: ls -1 /opt/benchmark/driver-kafka/*.yaml
-      register: kafka_drivers_list
-
-    - name: Configure Kafka Bootstrap Servers
-      lineinfile:
-         dest: '{{ item }}'
-         regexp: '^  bootstrap.servers='
-         line: '  bootstrap.servers={{ bootstrapServers }}'
-      with_items: '{{ kafka_drivers_list.stdout_lines }}'
 
     - name: Get list of jms driver config files
       raw: ls -1 /opt/benchmark/driver-jms/pulsar*.yaml
@@ -290,68 +267,6 @@
         name: "benchmark-worker"
 
 
-- name: Prometheus {{ prometheus_package['version'] }} installation
-  hosts: prometheus
-  connection: ssh
-  become: true
-  tasks:
-    - name: Add Extras Repo
-      shell: yum-config-manager --enable rhui-REGION-rhel-server-extras
-      when: prometheus_package is defined
-    - name: Install RPM packages
-      yum: pkg={{ item }} state=latest
-      with_items:
-          - docker
-      when: prometheus_package is defined
-    - file: path=/opt/prometheus state=absent
-      when: prometheus_package is defined
-    - file: path=/opt/prometheus state=directory
-      when: prometheus_package is defined
-    - name: Download Prometheus Binary Package
-      when: prometheus_package is defined
-      unarchive:
-        src: "{{ prometheus_package['url'] }}"
-        remote_src: yes
-        dest: /opt/prometheus
-        extra_opts: ["--strip-components=1"]
-    - set_fact:
-        private_ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
-
-- name: Prometheus {{ prometheus_package['version'] }} setup
-  hosts: prometheus
-  connection: ssh
-  become: true
-  tasks:
-    - file:
-        path: "/opt/prometheus/{{ item }}"
-        state: directory
-      with_items:
-        - data
-      when: prometheus_package is defined
-    - template:
-        src: "templates/prometheus.service"
-        dest: "/etc/systemd/system/prometheus.service"
-      when: prometheus_package is defined
-    - template:
-        src: "templates/pulsar-dashboard.service"
-        dest: "/etc/systemd/system/pulsar-dashboard.service"
-      when: prometheus_package is defined
-    - template:
-        src: "templates/prometheus.yml"
-        dest: "/opt/prometheus/prometheus.yml"
-      when: prometheus_package is defined
-    - systemd:
-        state: restarted
-        daemon_reload: yes
-        name: "prometheus"
-      when: prometheus_package is defined
-    - systemd:
-        state: restarted
-        daemon_reload: yes
-        name: "pulsar-dashboard"
-      when: prometheus_package is defined
-
-
 - name: List host addresses
   hosts: localhost
   become: false
@@ -365,7 +280,3 @@
     - debug:
         msg: "Benchmark clients {{ item }}"
       with_items: "{{ groups['client'] }}"
-    - debug:
-        msg: "Prometheus servers {{ item }}"
-      with_items: "{{ groups['prometheus'] }}"
-      when: prometheus_package is defined
