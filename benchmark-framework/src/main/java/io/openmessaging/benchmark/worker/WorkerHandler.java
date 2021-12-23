@@ -68,7 +68,7 @@ public class WorkerHandler {
         File tempFile = File.createTempFile("driver-configuration", "conf");
         Files.write(ctx.bodyAsBytes(), tempFile);
 
-        localWorker.initializeDriver(tempFile);
+        localWorker.initializeDriver(tempFile, null);
         tempFile.delete();
     }
 

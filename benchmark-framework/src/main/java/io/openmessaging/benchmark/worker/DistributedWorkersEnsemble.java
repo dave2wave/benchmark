@@ -83,9 +83,15 @@ public class DistributedWorkersEnsemble implements Worker {
     }
 
     @Override
-    public void initializeDriver(File configurationFile) throws IOException {
+    public void initializeDriver(File configurationFile, File consumerDriverFile) throws IOException {
         byte[] confFileContent = Files.readAllBytes(Paths.get(configurationFile.toString()));
-        sendPost(workers, "/initialize-driver", confFileContent);
+	if ( consumerDriverFile == null ) {
+	    sendPost(workers, "/initialize-driver", confFileContent);
+	} else {
+	    sendPost(producerWorkers, "/initialize-driver", confFileContent);
+	    confFileContent = Files.readAllBytes(Paths.get(consumerDriverFile.toString()));
+	    sendPost(consumerWorkers, "/initialize-driver", confFileContent);
+	}
     }
 
     @Override

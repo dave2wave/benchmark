@@ -120,7 +120,7 @@ public class LocalWorker implements Worker, ConsumerCallback {
     }
 
     @Override
-    public void initializeDriver(File driverConfigFile) throws IOException {
+    public void initializeDriver(File driverConfigFile, File consumerDriver) throws IOException {
         Preconditions.checkArgument(benchmarkDriver == null);
         testCompleted = false;
 
