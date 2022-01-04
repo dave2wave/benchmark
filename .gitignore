@@ -10,7 +10,9 @@ core/*.json
 *.json
 *.retry
 *.pem
+**/results/
 **/.terraform
+**/.terraform.lock.hcl
 **/terraform.tfstate
 **/terraform.tfstate.backup
 **/*.lock.info
