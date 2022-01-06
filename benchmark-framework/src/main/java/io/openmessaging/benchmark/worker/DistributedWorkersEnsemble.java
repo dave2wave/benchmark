@@ -154,6 +154,16 @@ public class DistributedWorkersEnsemble implements Worker {
     }
 
     @Override
+    public void pauseProducers() throws IOException {
+        sendPost(producerWorkers, "/pause-producers", new byte[0]);
+    }
+
+    @Override
+    public void resumeProducers() throws IOException {
+        sendPost(producerWorkers, "/resume-producers", new byte[0]);
+    }
+
+    @Override
     public void pauseConsumers() throws IOException {
         sendPost(consumerWorkers, "/pause-consumers", new byte[0]);
     }

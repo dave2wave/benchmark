@@ -352,6 +352,19 @@ public class WorkloadGenerator implements AutoCloseable {
             }
         }
 
+	if ( workload.producerPauseBeforeDrain > 0 ) {
+
+	    log.info("--- Pause production for {} seconds ---", workload.producerPauseBeforeDrain);
+
+	    worker.pauseProducers();
+	    try {
+		Thread.sleep(workload.producerPauseBeforeDrain * 1000);
+	    } catch (InterruptedException e) {
+		throw new RuntimeException(e);
+	    }
+	    worker.resumeProducers();
+	}
+	
         log.info("--- Start draining backlog ---");
 
         worker.resumeConsumers();
