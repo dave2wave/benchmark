@@ -32,16 +32,16 @@ $ sudo bin/benchmark \
 
 |  Options  | Description |
 | ---- | ---- |
-|  -d, --drivers | Drivers list. eg.: pulsar/pulsar.yaml, kafka/kafka.yaml |
+|  -d, --drivers | Drivers list. eg.: pulsar/pulsar.yaml, kafka/kafka.yaml. The workload is run for each driver provided. |
 |  -cd, --consumer-driver | Path to an alternative driver file for consumption |
 |  -w, --workers | List of worker nodes. eg: http://1.2.3.4:8080,http://4.5.6.7:8080 |
-|  -wf, --workers-file | Path to a YAML file containing the list of workers addresses |
+|  -wf, --workers-file | Path to a YAML file containing the list of workers addresses. The dafult is look for `./workers.yaml` |
 |  -c, --csv |  Print results from this directory to a csv file |
 |  -x, --extra |  Allocate extra consumer workers when your backlog builds. Essentially averages twice as many consumer workers as producers. |
 
 ### Examples
 
-1. Produce with Pulsar driver and consumer with Starlight for Kafka.
+1. Produce with Pulsar driver and consume with Starlight for Kafka.
 
    ```
    $ sudo bin/benchmark \
