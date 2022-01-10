@@ -31,6 +31,7 @@ $ sudo bin/benchmark \
 ```
 
 |  Options  | Description |
+| ---- | ---- |
 |  -d, --drivers | Drivers list. eg.: pulsar/pulsar.yaml, kafka/kafka.yaml |
 |  -cd, --consumer-driver | Path to an alternative driver file for consumption |
 |  -w, --workers | List of worker nodes. eg: http://1.2.3.4:8080,http://4.5.6.7:8080 |
@@ -50,6 +51,7 @@ $ sudo bin/benchmark \
 The following parametes are available for a workload file:
 
 | Data Type | Key | Description |
+| ---- | ---- | ---- |
 | String | name | The name of this workload |
 | int | topics |  Number of topics to create in the test |
 | int | partitionsPerTopic |  Number of partitions each topic will contain |
