@@ -39,12 +39,25 @@ $ sudo bin/benchmark \
 |  -c, --csv |  Print results from this directory to a csv file |
 |  -x, --extra |  Allocate extra consumer workers when your backlog builds. Essentially averages twice as many consumer workers as producers. |
 
-```
-$ sudo bin/benchmark \
-  --drivers driver-pulsar/pulsar.yaml \
-  --consumer-driver driver-kafka/kafka-s4k.yaml \
-  workloads/1m-10-topics-3-partitions-100b.yaml
-```
+### Examples
+
+1. Produce with Pulsar driver and consumer with Starlight for Kafka.
+
+   ```
+   $ sudo bin/benchmark \
+     --drivers driver-pulsar/pulsar.yaml \
+     --consumer-driver driver-kafka/kafka-s4k.yaml \
+     workloads/1m-10-topics-3-partitions-100b.yaml
+   ```
+
+2. Benchmark using Starlight for JMS with twice as many consumer benchmark workers.
+
+   ```
+   $ sudo bin/benchmark \
+     --drivers driver-jms/pulsar-jms.yaml \
+     --extra workloads/1m-10-topics-3-partitions-100b.yaml 
+   ```
+
 
 ## Workload parameters
 
@@ -71,3 +84,49 @@ The following parametes are available for a workload file:
 | long | producerPauseBeforeDrain | If doing a backlog draining test and producerPauseBeforeDrain > 0 then once the desired backlog is achieved then pause production for the indicated number of seconds. During the pause you can take whatever action you wish to take on your cluster like restarting the brokers. |
 |  int | testDurationMinutes | How long to run the benchmark test. |
 
+### Examples
+
+1. Produce at 1,000,000 message per second.
+
+   ```
+   name: 1m-10-topics-3-partitions-100b
+
+   topics: 10
+   partitionsPerTopic: 3
+   messageSize: 100
+   useRandomizedPayloads: true
+   randomBytesRatio: 0.5
+   randomizedPayloadPoolSize: 1000
+
+   subscriptionsPerTopic: 1
+   consumerPerSubscription: 1
+   producersPerTopic: 1
+
+   producerRate: 1000000
+
+   consumerBacklogSizeGB: 0
+   testDurationMinutes: 15
+   ```
+
+2. Build a 128GB backlog and then drain
+
+   ```
+   name: 1m-10-topics-3-partitions-100b-128g-backlog
+
+   topics: 10
+   partitionsPerTopic: 3
+   messageSize: 100
+   useRandomizedPayloads: true
+   randomBytesRatio: 0.5
+   randomizedPayloadPoolSize: 1000
+
+   subscriptionsPerTopic: 1
+   consumerPerSubscription: 1
+   producersPerTopic: 1
+
+   producerRate: 1000000
+
+   consumerBacklogSizeGB: 128
+   acceptableBacklog: 30000
+   testDurationMinutes: 30
+   ```
